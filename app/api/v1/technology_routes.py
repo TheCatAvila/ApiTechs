@@ -13,11 +13,19 @@ async def create_technology(test: TechTest):
 # Endpoint GET de prueba para devolver datos
 @router.get("/test-data")
 async def get_test_data():
-    # Simulamos datos que podrían venir de la base de datos
+    
+    from app.models.technologies import Technology
+    tech = Technology()
+    db_result = tech.test()
+    if db_result:
+        database_name = db_result['DATABASE()'] if db_result else 'Desconocida'
+    else:
+        database_name = 'Desconocida'
+
     sample_data = [
         {"name": "Python", "description": "Lenguaje de programación muy popular"},
         {"name": "FastAPI", "description": "Framework para APIs en Python"},
-        {"name": "MySQL", "description": "Base de datos relacional"}
+        {"name": "MySQL", "description": database_name}
     ]
     return {
         "message": "Datos de prueba obtenidos correctamente",
