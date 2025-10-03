@@ -24,7 +24,15 @@ class Technology:
                         FROM technology_uses tu
                         JOIN common_use u ON u.id = tu.use_id
                         WHERE tu.technology_id = t.id
-                    ) AS uses
+                    ) AS uses,
+                    (
+                        SELECT JSON_ARRAYAGG(
+                                JSON_OBJECT('id', t2.id, 'name', t2.name)
+                            )
+                        FROM influenced_by ib
+                        JOIN technologies t2 ON t2.id = ib.influenced_by_id
+                        WHERE ib.technology_id = t.id
+                    ) AS influenced_by
                 FROM technologies t
                 LEFT JOIN category c ON t.category_id = c.id
                 LEFT JOIN type ty ON t.type_id = ty.id
@@ -39,7 +47,7 @@ class Technology:
 
             # Convertir strings JSON a objetos Python
             for row in tech_data:
-                for key in ["category", "type", "paradigm", "company", "license", "uses"]:
+                for key in ["category", "type", "paradigm", "company", "license", "uses", "influenced_by"]:
                     if row[key]:
                         try:
                             row[key] = json.loads(row[key])
